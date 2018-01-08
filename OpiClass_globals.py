@@ -8,11 +8,24 @@ Created on Mon Jan  8 02:26:54 2018
 
 
 def init():
+    import os
     import json
-    
+    import flask
+    from flask import Flask, flash, redirect, render_template, request, session, abort, url_for
+    from flask import Flask, render_template
+    from flask_socketio import SocketIO,send,emit
+
+    global app
+    global socketio
     global thread_id
     global progress_list
+    global counter
+    
+    app = Flask(__name__)
+    app.secret_key = os.urandom(12)
+    socketio = SocketIO(app,async_mode='threading')
     
     thread_id=0;
     progress_list={}
+    counter={}
 
