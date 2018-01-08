@@ -23,7 +23,7 @@ def init():
     
     app = Flask(__name__)
     app.secret_key = os.urandom(12)
-    socketio = SocketIO(app,async_mode='threading')
+    socketio = SocketIO(app,port=5000,async_mode='threading',logger=False)
     
     thread_id=0;
     progress_list={}

@@ -9,6 +9,8 @@ Created on Mon Jan  8 01:23:28 2018
 import threading
 import time
 import OpiClass_globals as ocg
+import OpiClass_scraper as ocs
+import OpiClass_filter as ocf
 
 
 exitFlag = 0
@@ -22,16 +24,19 @@ class myThread (threading.Thread):
       
    def run(self):
       print("Starting ThreadID-" + str(self.threadID) + ". Processing: "+self.url)
-      print_time(self.threadID, 5, self.counter)
+      print_time(self.threadID, 5, self.counter,self.url)
       print("Exiting " + str(self.threadID))
 
-def print_time(threadID, counter, delay):
+def print_time(threadID, counter, delay, url):
    while counter:
       if exitFlag:
          threadID.exit()
       time.sleep(delay)
       ##print("ThreadID-%s: %s" % (threadID, time.ctime(time.time())))
       ocg.progress_list[threadID]+=20
+      appid=url.split(sep="=")[1]
+      ocs.main(appid)
+      ocf.main(appid)
       ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list} , broadcast=False)
       #print(ocg.progress_list)
       counter -= 1
