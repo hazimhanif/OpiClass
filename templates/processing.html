@@ -41,6 +41,9 @@
     
     var socket = io.connect('http://' + document.domain + ':' + location.port);
     var pg=0;
+    
+    
+    
     var redirect = function(){
       window.location="{{ url_for('results') }}";
     };
@@ -50,6 +53,9 @@
     });
     
     socket.on('updateVal', function(msg) {
+    
+    console.log({{current_thread}})
+    console.log(msg.progress_list[{{current_thread}}])
             
             if(msg.progress_list[{{current_thread}}]!=pg){
             
@@ -59,7 +65,7 @@
             void element.offsetWidth;
             element.classList.add("animated");
             element.classList.add("fadeInUp");
-            element.innerHTML = msg.progress_list[{{current_thread}}];
+            element.innerHTML = msg.text;
 
 
             loadbar.set(msg.progress_list[{{current_thread}}]);

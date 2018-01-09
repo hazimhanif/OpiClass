@@ -31,6 +31,15 @@
     <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript">
 
+    function preventBack(){window.history.forward();}
+    
+    window.onbeforeunload = function() { return "Not reccommended. Your data will lost."; };
+
+    setTimeout("preventBack()", 0);
+
+    window.onunload=function(){null};
+
+
         var dataSet = {{ds|tojson}};
     
         $(document).ready(function() {
@@ -52,16 +61,14 @@
     
 
   </head>
-  <body>
+  <body id="page-top">
   
       <!-- Dummy Navigation -->
-    <div>
     <nav class="navbar navbar-expand-lg bg-secondary fixed-top" id="mainNav">
       <div class="container">
         <a class="navbar-brand js-scroll-trigger" href="#page-top">OpiClass</a>
-        <button class="navbar-toggler navbar-toggler-right text-uppercase bg-primary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-          Menu
-          <i class="fa fa-bars"></i>
+        <button class="navbar-toggler navbar-toggler-right text-uppercase bg-primary text-white rounded"  type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <a style="color:#FFFFFF"; href="{{ url_for('home') }}">HOME</a>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
@@ -72,7 +79,6 @@
         </div>
       </div>
     </nav>
-    </div>
 
     <header class="masthead bg-white text-secondary text-center">
       <div class="container">

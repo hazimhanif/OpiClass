@@ -12,7 +12,7 @@ from lxml import html
 import json
 from bs4 import BeautifulSoup
 import play_scraper
-
+import OpiClass_globals as ocg
 
 global reviewsCounter
 global appsCounter
@@ -30,7 +30,7 @@ def saveRawData(raw_data,appId,pageNum):
     except Exception as e:
         print(e)
 
-def sendRequest(appid):
+def sendRequest(appid,threadID):
     global skipApp
     
     skipApp=False
@@ -95,7 +95,7 @@ def sendRequest(appid):
             break
         
         saveRawData(js[0][2],appid,pageNum)
-        revsPerPage=getReviews(appSingleInfo,review_date,review_text,review_rating,review_author,review_title)
+        revsPerPage=getReviews(threadID,appSingleInfo,review_date,review_text,review_rating,review_author,review_title)
         
         try:
             while(True):
@@ -109,7 +109,7 @@ def sendRequest(appid):
     return(revList)
         
     
-def getReviews(appSingleInfo,review_date,review_text,review_rating,review_author,review_title):
+def getReviews(threadID,appSingleInfo,review_date,review_text,review_rating,review_author,review_title):
     global reviewsCounter
     
     rateList={"Dinilaikan 5 bintang daripada lima bintang":5,
@@ -147,6 +147,10 @@ def getReviews(appSingleInfo,review_date,review_text,review_rating,review_author
             revPerPage.append({'appId':appSingleInfo['app_id'],'appTitle':appSingleInfo['title'],'appScore':float(appSingleInfo['score']),'appPrice':float(appSingleInfo['price']),'revDate': rev_date,'revAuthor':rev_author,'revRating':float(rev_rating),'revTitle':rev_title,'revText':rev_text})
             reviewsCounter+=1
             c=c+1
+            if reviewsCounter==40:
+                msg='Scraping opinions for %s' % (appSingleInfo['app_id'])
+                ocg.progress_list[threadID]+=10
+                ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
                
     except Exception as e:
         None
@@ -164,10 +168,17 @@ def saveRevToFile(appId,revPerApp):
 
 
 
-def start(appid):
+def start(appid,threadID):
+    msg='Initiate scraping for %s' % (appid)
+    ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
     print("======Starting Scraping=======")
-    revPerApp=sendRequest(appid)
+    revPerApp=sendRequest(appid,threadID)
     saveRevToFile(appid,revPerApp)
-    print("======Finish Scrapining=======")
+    if ocg.progress_list[threadID]!=25:
+        ocg.progress_list[threadID]+=(25-ocg.progress_list[threadID])
     
-#'https://play.google.com/store/apps/details?id=air.com.hypah.io.slither'    
+    msg='Finished scraping for %s' % (appid)
+    ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
+        
+    print("======Finish Scrapining=======")
+  

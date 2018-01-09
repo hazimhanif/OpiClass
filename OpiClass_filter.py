@@ -9,6 +9,7 @@ import os
 import codecs
 import json
 import re
+import OpiClass_globals as ocg
 
 global wordList
 global indonList
@@ -52,16 +53,23 @@ def isEnglish(wordEng):
     return 0
 
     
-def getReviews(data):
+def getReviews(data,threadID,appid):
     global english_count
     global indon_count
     global total_count
     global drop_count
     i=0
     size_data = len(data)
+    checkcount=0
     print("Total review:"+ str(size_data))
     while i < size_data:
         print(i)
+        if(checkcount==int(size_data/6)):
+            msg='Filtering opinions for %s' % (appid)
+            ocg.progress_list[threadID]+=10
+            ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
+            checkcount+=int(size_data/6)
+            
         countEnglish_perRev=0
         countIndon_perRev=0
         words=str(data[i]['revText']).strip(".,!?:;`~@#$%^&*()-+=*'[]{}|\"/<>")
@@ -113,12 +121,19 @@ def loadWordList():
     data=codecs.open("data/dict/indon.txt",'rb','utf-8')    
     indonList=data.readlines()   
         
-def start(appid):
+def start(appid,threadID):
     print("======Starting Filtering=======")
+    msg='Initiate filtering for %s' % (appid)
+    ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
     file="%s.json" % (appid)
     loadWordList()
     data=openFile(file)
-    data=getReviews(data)
+    data=getReviews(data,threadID,appid)
     saveFilteredReviews(data,file)
+    if ocg.progress_list[threadID]!=85:
+        ocg.progress_list[threadID]+=(85-ocg.progress_list[threadID])
+    
+    msg='Finished filtering for %s' % (appid)
+    ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
     print("======Finish Filtering=======")
     

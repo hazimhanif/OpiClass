@@ -7,43 +7,48 @@ Created on Mon Jan  8 01:23:28 2018
 """
 
 import threading
-import time
 import OpiClass_globals as ocg
 import OpiClass_scraper as ocs
 import OpiClass_filter as ocf
+import OpiClass_model as ocm
+import os
 
 
 exitFlag = 0
 
 class myThread (threading.Thread):
-   def __init__(self, threadID, counter,url):
+   def __init__(self, threadID,name,url):
       threading.Thread.__init__(self)
       self.threadID = threadID
-      self.counter = counter
+      self.name = name
       self.url = url
       
    def run(self):
-      print("Starting ThreadID-" + str(self.threadID) + ". Processing: "+self.url)
-      print_time(self.threadID, 5, self.counter,self.url)
+      print("Starting " + self.name + ". Processing: "+self.url)
+      print_time(self.name,self.threadID,self.url)
       print("Exiting " + str(self.threadID))
 
-def print_time(threadID, counter, delay, url):
-   while counter:
-      if exitFlag:
-         threadID.exit()
-      time.sleep(delay)
-      ##print("ThreadID-%s: %s" % (threadID, time.ctime(time.time())))
-      ocg.progress_list[threadID]+=20
-      #appid=url.split(sep="=")[1]
-      #ocs.main(appid)
-      #ocf.main(appid)
-      ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list} , broadcast=False)
-      #print(ocg.progress_list)
-      counter -= 1
+def print_time(threadName,threadID,threadUrl):
+      appid=ocg.app_list[threadID]
+      file2 = "%s.json"%(appid)
+      if file2 not in os.listdir("data/web_preview"):
+          msg='Initiate request for %s' % (appid)
+          ocg.progress_list[threadID]+=5
+          ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
+          ocs.start(appid,threadID)
+          ocf.start(appid,threadID)
+          ocm.start(appid,threadID)
+      else:
+          print("File already exist")
+          msg='File already exist for %s. Proceeding.' % (appid)
+          ocg.progress_list[threadID]=100
+          ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
+          
+      return
 
 
 def init(thread_id,url):
     # Create new threads
-    
-    myThread(ocg.thread_id, 1,url).start()
+    myname = "Thread of %s"% str(ocg.thread_id)
+    myThread(ocg.thread_id,myname,url).start()
     

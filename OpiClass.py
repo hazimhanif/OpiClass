@@ -38,12 +38,13 @@ def processing():
     ocg.progress_list[ocg.thread_id]=0
     ocg.app_list[ocg.thread_id]= request.form['url'].split(sep="=")[1]
     current_thread = ocg.thread_id
-    oct.init(ocg.thread_id,request.form['url'])
+    #oct.init(ocg.thread_id,request.form['url'])
     return render_template('processing.html',current_thread=current_thread)
 
 @ocg.socketio.on('connect')
 def client_connected():
     print('Client connected')
+    oct.init(ocg.thread_id,ocg.app_list[ocg.thread_id])
 
 def main():
     print("Starting webserver...")
@@ -54,5 +55,5 @@ if __name__ == '__main__':
 
 
 
-#ds=pd.read_json("data/web_preview/air.com.hypah.io.slither.json",encoding="utf-8")
-#ds=ds.loc[1:,["appId" ,"appPrice","appScore","appTitle","revAuthor","revDate","revRating","revText","revTitle","predicted"]].values.tolist()
+    
+#'https://play.google.com/store/apps/details?id=air.com.hypah.io.slither'  
