@@ -1,3 +1,5 @@
+args = commandArgs(trailingOnly=TRUE)
+
 ## Importing library
 library(stringdist)
 library(stringr)
@@ -5,14 +7,18 @@ library(stringi)
 library(RSentiment)
 library(jsonlite)
 library(car)
+library(gbm)
+
+## Set WD
+setwd("/Volumes/Extended/OneDrive/Documents/FSKTM/Master (Sentiment Analysis)/Thesis/OpiClass")
 
 ## Source the functions file
 source("r_scripts/yelp_func.R")
 
 ##Reading file
-dataset <- fromJSON(txt="data/filtered_reviews/air.com.hypah.io.slither.json",flatten = TRUE)
+dataset <- fromJSON(txt=paste("data/filtered_reviews/",args[1],".json",sep = ""),flatten = TRUE)
 dataset$id <- seq(1,nrow(dataset))
-  
+
 print("Converting date data to real date type.")
 month_list<-list()
 {
@@ -117,5 +123,15 @@ for(i in (num_cont_features+1):ncol(df_dataset)){
   df_dataset[,i] <- as.factor(df_dataset[,i])
 }
 
-write.csv(x = df_dataset,file = "data/dataset/air.com.hypah.io.slither.csv",row.names = FALSE)
-
+####Read Model
+model <- readRDS("data/model/poisb_mod_private_exp2.rds")
+predicted <- predict(model,df_dataset,type = "response",n.trees = 30)
+cutoff <- 0.5982485
+predicted[predicted>=cutoff] <- 1
+predicted[predicted<cutoff] <- 0
+predicted <- as.factor(predicted)
+levels(predicted) <- c("Spam","Normal")
+dataset$predicted <- predicted
+df_dataset$predicted <- predicted
+write_json(dataset[,-10],paste("data/web_preview/",args[1],".json",sep = ""),pretty = TRUE)
+write.csv(df_dataset,paste("data/dataset/",args[1],".csv",sep = ""),row.names = FALSE)
