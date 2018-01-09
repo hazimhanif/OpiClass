@@ -164,13 +164,10 @@ def saveRevToFile(appId,revPerApp):
 
 
 
-def main():
-    print("======Playstore scraper 0.1========")
-    appid="air.com.hypah.io.slither"
+def start(appid):
+    print("======Starting Scraping=======")
     revPerApp=sendRequest(appid)
     saveRevToFile(appid,revPerApp)
-    print("Done scraping")
+    print("======Finish Scrapining=======")
     
-if __name__ == '__main__':
-    main()
 #'https://play.google.com/store/apps/details?id=air.com.hypah.io.slither'    

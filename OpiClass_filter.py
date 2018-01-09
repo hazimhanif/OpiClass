@@ -113,13 +113,12 @@ def loadWordList():
     data=codecs.open("data/dict/indon.txt",'rb','utf-8')    
     indonList=data.readlines()   
         
-def main():
-    appid='air.com.hypah.io.slither'
+def start(appid):
+    print("======Starting Filtering=======")
     file="%s.json" % (appid)
     loadWordList()
     data=openFile(file)
     data=getReviews(data)
     saveFilteredReviews(data,file)
-
-if __name__ == '__main__':
-    main()
+    print("======Finish Filtering=======")
+    
