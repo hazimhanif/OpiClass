@@ -34,9 +34,9 @@ def print_time(threadID, counter, delay, url):
       time.sleep(delay)
       ##print("ThreadID-%s: %s" % (threadID, time.ctime(time.time())))
       ocg.progress_list[threadID]+=20
-      appid=url.split(sep="=")[1]
-      ocs.main(appid)
-      ocf.main(appid)
+      #appid=url.split(sep="=")[1]
+      #ocs.main(appid)
+      #ocf.main(appid)
       ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list} , broadcast=False)
       #print(ocg.progress_list)
       counter -= 1
