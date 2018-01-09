@@ -42,8 +42,6 @@
     var socket = io.connect('http://' + document.domain + ':' + location.port);
     var pg=0;
     
-    
-    
     var redirect = function(){
       window.location="{{ url_for('results') }}";
     };

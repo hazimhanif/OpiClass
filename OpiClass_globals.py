@@ -14,6 +14,7 @@ def init():
     from flask import Flask, render_template
     from flask_socketio import SocketIO,send,emit
     import eventlet
+    import gevent
 
     global app
     global socketio
@@ -23,7 +24,7 @@ def init():
     
     app = Flask(__name__)
     app.secret_key = os.urandom(12)
-    socketio = SocketIO(app,async_mode='threading',logger=False)
+    socketio = SocketIO(app,async_mode='threading',engineio_logger=False)
     
     thread_id=0;
     progress_list={}

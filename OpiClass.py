@@ -17,6 +17,8 @@ from flask import Flask, flash, redirect, render_template, request, session, abo
 from flask import Flask, render_template
 ocg.init()
 
+global connected_thread
+connected_thread=[0]
 
 
 @ocg.app.route('/')
@@ -25,6 +27,7 @@ def home():
     
 @ocg.app.route('/results')
 def results():
+    print(ocg.app_list)
     filename="data/web_preview/%s.json"%(ocg.app_list[ocg.thread_id])
     ds=pd.read_json(filename,encoding="utf-8")
     dsnew=ds.loc[1:,["revAuthor","revDate","revRating","revTitle","revText","predicted"]].values.tolist()
@@ -34,17 +37,28 @@ def results():
 
 @ocg.app.route('/processing', methods=['POST'])
 def processing():
-    ocg.thread_id+=1
+    try:
+        ocg.thread_id+=1
+        ocg.app_list[ocg.thread_id]= request.form['url'].split(sep="=")[1]
+    except:
+        ocg.thread_id-=1
+        return redirect(url_for('home'))
+    
     ocg.progress_list[ocg.thread_id]=0
-    ocg.app_list[ocg.thread_id]= request.form['url'].split(sep="=")[1]
     current_thread = ocg.thread_id
-    #oct.init(ocg.thread_id,request.form['url'])
+    #oct.init(ocg.thread_id,ocg.app_list[ocg.thread_id])
     return render_template('processing.html',current_thread=current_thread)
 
 @ocg.socketio.on('connect')
 def client_connected():
-    print('Client connected')
-    oct.init(ocg.thread_id,ocg.app_list[ocg.thread_id])
+    global connected_thread
+    if ocg.thread_id in connected_thread:
+        return
+    else:
+        connected_thread.append(ocg.thread_id)
+        print('Client connected')
+        oct.init(ocg.thread_id,ocg.app_list[ocg.thread_id])
+
 
 def main():
     print("Starting webserver...")
@@ -53,7 +67,5 @@ def main():
 if __name__ == '__main__':
     main()
 
-
-
-    
+#test url
 #'https://play.google.com/store/apps/details?id=air.com.hypah.io.slither'  

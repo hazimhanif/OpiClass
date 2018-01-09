@@ -13,6 +13,7 @@ import json
 from bs4 import BeautifulSoup
 import play_scraper
 import OpiClass_globals as ocg
+import os
 
 global reviewsCounter
 global appsCounter
@@ -149,7 +150,7 @@ def getReviews(threadID,appSingleInfo,review_date,review_text,review_rating,revi
             c=c+1
             if reviewsCounter==40:
                 msg='Scraping opinions for %s' % (appSingleInfo['app_id'])
-                ocg.progress_list[threadID]+=10
+                ocg.progress_list[threadID]+=8
                 ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
                
     except Exception as e:
@@ -169,6 +170,14 @@ def saveRevToFile(appId,revPerApp):
 
 
 def start(appid,threadID):
+    file2 = "%s.json"%(appid)
+    if file2 in os.listdir("data/reviews"):
+        msg='Opinions already exist for %s' % (appid)
+        ocg.progress_list[threadID]=25
+        ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
+        return
+    
+    ocg.progress_list[threadID]+=2
     msg='Initiate scraping for %s' % (appid)
     ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
     print("======Starting Scraping=======")

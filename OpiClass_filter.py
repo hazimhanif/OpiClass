@@ -58,17 +58,20 @@ def getReviews(data,threadID,appid):
     global indon_count
     global total_count
     global drop_count
-    i=0
-    size_data = len(data)
     checkcount=0
+    i=0
+    
+    size_data = len(data)
+    division=int(size_data/30)
+    checkcount+=division
     print("Total review:"+ str(size_data))
     while i < size_data:
-        print(i)
-        if(checkcount==int(size_data/6)):
-            msg='Filtering opinions for %s' % (appid)
-            ocg.progress_list[threadID]+=10
+        #print(i)
+        if i==checkcount and ocg.progress_list[threadID]<85:
+            ocg.progress_list[threadID]+=division
+            msg='Filtering opinions for %s. Please sit back, relax and have a coffee  ☕️' % (appid)
             ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
-            checkcount+=int(size_data/6)
+            checkcount+=division
             
         countEnglish_perRev=0
         countIndon_perRev=0
@@ -124,6 +127,7 @@ def loadWordList():
 def start(appid,threadID):
     print("======Starting Filtering=======")
     msg='Initiate filtering for %s' % (appid)
+    ocg.progress_list[threadID]+=2
     ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
     file="%s.json" % (appid)
     loadWordList()

@@ -12,6 +12,7 @@ import os
 def start(appid,threadID):
     print("======Starting Modeller=======")
     msg='Initiate features extraction & prediction for %s' % (appid)
+    ocg.progress_list[threadID]+=10
     ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
     command = '/usr/local/bin/Rscript'
     arg = '--vanilla'
