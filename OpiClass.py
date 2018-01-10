@@ -35,7 +35,7 @@ def results():
     appinfo.append(len(ds[ds['predicted']=="Spam"]))
     return render_template('results.html',appid = ocg.app_list[ocg.thread_id],ds=dsnew,info=appinfo)
 
-@ocg.app.route('/processing', methods=['POST'])
+@ocg.app.route('/processing',  methods=['POST'])
 def processing():
     try:
         ocg.thread_id+=1
