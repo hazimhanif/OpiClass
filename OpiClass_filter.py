@@ -62,7 +62,7 @@ def getReviews(data,threadID,appid):
     i=0
     
     size_data = len(data)
-    division=int(size_data/30)
+    division=int(size_data/25)
     checkcount+=division
     print("Total review:"+ str(size_data))
     while i < size_data:

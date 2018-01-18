@@ -11,9 +11,9 @@ import codecs
 from lxml import html
 import json
 from bs4 import BeautifulSoup
-import play_scraper
 import OpiClass_globals as ocg
 import os
+import re
 
 global reviewsCounter
 global appsCounter
@@ -30,6 +30,7 @@ def saveRawData(raw_data,appId,pageNum):
         fopen.write(raw_data)
     except Exception as e:
         print(e)
+        print("adsdsfadsfas")
 
 def sendRequest(appid,threadID):
     global skipApp
@@ -39,8 +40,24 @@ def sendRequest(appid,threadID):
     revList=[]
     
     
-    appSingleInfo=play_scraper.details(appid)
+    ### This is scrap app info section
+    url = 'https://play.google.com/store/apps/details?id=%s' % (appid)
+    req = requests.get(url)
+    text = req.text
     
+    allcontent=BeautifulSoup(text,"lxml").find( 'div', {'class':'main-content'} )
+    appTitle=BeautifulSoup(str(allcontent),"lxml").find( 'div', {'class':'id-app-title'} ).contents[0]
+    appID=BeautifulSoup(str(allcontent),"lxml").find( 'div', attrs={"class":"app-compatibility"})['data-docid']
+    appPriceString=BeautifulSoup(str(allcontent),"lxml").find( 'meta', attrs={"itemprop":"price"})['content']
+    listnum=re.findall('[1-90.]',str(appPriceString),)
+    appPrice=""
+    for i in listnum:
+        appPrice=appPrice+i
+    appPrice=float(appPrice)
+    appScore=float(BeautifulSoup(str(allcontent),"lxml").find( 'meta', attrs={"itemprop":"ratingValue"})['content'])
+    del(allcontent)
+    appSingleInfo ={"appId":appID,"appTitle":appTitle,"appScore":appScore,"appPrice":appPrice}
+    ### This is scrap app info section    
     
     while(pageN<=1):
         url = "https://play.google.com/store/getreviews"
@@ -132,20 +149,22 @@ def getReviews(threadID,appSingleInfo,review_date,review_text,review_rating,revi
     
     try:
         while(c < len(review_rating)):
-            rev_date=review_date[c]
-            rev_author=review_author[c]
-            rev_rating=rateList[review_rating[c]]
-            rev_title=review_title[c]
-            rev_text=review_text[c]
-            
-            if rev_title==" " or rev_title=="":
-                rev_title="NA"
-            if rev_text==" " or rev_text=="":
-                rev_text="NA"
-            if rev_author==" " or rev_author=="":
-                rev_author="NA"
-    
-            revPerPage.append({'appId':appSingleInfo['app_id'],'appTitle':appSingleInfo['title'],'appScore':float(appSingleInfo['score']),'appPrice':float(appSingleInfo['price']),'revDate': rev_date,'revAuthor':rev_author,'revRating':float(rev_rating),'revTitle':rev_title,'revText':rev_text})
+            try:
+                rev_date=review_date[c]
+                rev_author=review_author[c]
+                rev_rating=rateList[review_rating[c]]
+                rev_title=review_title[c]
+                rev_text=review_text[c]
+
+                if rev_title==" " or rev_title=="":
+                    rev_title="NA"
+                if rev_text==" " or rev_text=="":
+                    rev_text="NA"
+                if rev_author==" " or rev_author=="":
+                    rev_author="NA"
+            except:
+                print("Caught here 1")
+            revPerPage.append({'appId':appSingleInfo['appId'],'appTitle':appSingleInfo['appTitle'],'appScore':float(appSingleInfo['appScore']),'appPrice':float(appSingleInfo['appPrice']),'revDate': rev_date,'revAuthor':rev_author,'revRating':float(rev_rating),'revTitle':rev_title,'revText':rev_text})
             reviewsCounter+=1
             c=c+1
             if reviewsCounter==40:
@@ -166,8 +185,6 @@ def saveRevToFile(appId,revPerApp):
             json.dump(revPerApp, outfile, indent=4, sort_keys=True, separators=(',', ':'),ensure_ascii=False)
     except Exception as e:
         print(e)
-
-
 
 def start(appid,threadID):
     file2 = "%s.json"%(appid)

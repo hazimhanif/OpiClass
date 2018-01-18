@@ -14,9 +14,9 @@ def start(appid,threadID):
     msg='Initiate features extraction & prediction for %s' % (appid)
     ocg.progress_list[threadID]+=10
     ocg.socketio.emit('updateVal', {'progress_list': ocg.progress_list, 'text':msg} , broadcast=False)
-    command = '/usr/local/bin/Rscript'
+    command = '/usr/bin/Rscript'
     arg = '--vanilla'
-    path2script = '/Volumes/Extended/OneDrive/Documents/FSKTM/Master (Sentiment Analysis)/Thesis/OpiClass/r_scripts/playstore.R'
+    path2script = '/home/hazim/OpiClass/r_scripts/playstore.R'
     try:
         subprocess.call([command, arg, path2script, appid])
     except:

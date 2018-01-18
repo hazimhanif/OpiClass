@@ -25,25 +25,33 @@
     <link href="/static/css/freelancer.min.css" rel="stylesheet">
     
 
-    <!-- Datatables JS & cass -->
+    <!-- Datatables JS -->
     <link href="/static/css/jquery.dataTables.min.css" rel="stylesheet">
+      
+    <link href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/responsive/2.2.1/css/responsive.dataTables.min.css" rel="stylesheet">  
+      
     <script type="text/javascript" src="/static/js/jquery-1.12.4.js"></script>
     <script type="text/javascript" src="/static/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript">
-
-    function preventBack(){window.history.forward();}
     
-    window.onbeforeunload = function() { return "Not reccommended. Your data will lost."; };
-
-    setTimeout("preventBack()", 0);
-
-    window.onunload=function(){null};
-
+    <script type="text/javascript" src="/static/js/pdfmake.min.js"></script>
+    <script type="text/javascript" src="/static/js/vfs_fonts.js"></script>
+    <script type="text/javascript" src="/static/js/jszip.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.datatables.net/responsive/2.2.1/js/dataTables.responsive.min.js"></script> 
+      
+    <script type="text/javascript">
 
         var dataSet = {{ds|tojson}};
     
         $(document).ready(function() {
             $('#reviews').DataTable( {
+                responsive: true,
+                dom: 'Bfrtip',
+                    buttons: [
+        'copy', 'excel', 'pdf'
+    ],
                 data: dataSet,
                 columns: [
                     { title: "Author" },
@@ -86,7 +94,12 @@
               <h4>App Title: {{info[0]}}</h4>
               <h4>App Price: RM{{info[1]}}</h4>
               <h4>App Score: {{info[2]}}</h4>
-              <h4>Spams Detected: {{info[3]}}</4>
+              <h4>Spams Detected: {{info[3]}}</h4>
+              
+              <form action="/download" method="POST">
+                <input type="submit" class="btn btn-info" value="Download dataset for {{appid}}" 
+                     name="Submit" id="frm1_submit"/>
+             </form>
           </div>
           <div>
           <table id="reviews" class="display" width="100%"></table>

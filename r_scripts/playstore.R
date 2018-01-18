@@ -6,11 +6,11 @@ library(stringr)
 library(stringi)
 library(RSentiment)
 library(jsonlite)
-library(car)
+#library(car)
 library(gbm)
 
 ## Set WD
-setwd("/Volumes/Extended/OneDrive/Documents/FSKTM/Master (Sentiment Analysis)/Thesis/OpiClass")
+setwd("/home/hazim/OpiClass")
 
 ## Source the functions file
 source("r_scripts/yelp_func.R")
@@ -54,7 +54,7 @@ for(x in seq(1,nrow(dataset))){
   obs<-func_clean_NA(obs)
   
   ##Features Extraction: Total 37
-  print(x)
+#  print(x)
   ##Continuos values features
   app_score<-as.double(obs$appScore)
   rev_body_len<-str_length(obs$revText)
